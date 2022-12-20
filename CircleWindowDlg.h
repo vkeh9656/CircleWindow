@@ -8,6 +8,10 @@
 // CCircleWindowDlg 대화 상자
 class CCircleWindowDlg : public CDialogEx
 {
+private:
+	CPoint m_prev_pos;
+	char m_is_clicked = 0;
+
 // 생성입니다.
 public:
 	CCircleWindowDlg(CWnd* pParent = nullptr);	// 표준 생성자입니다.
@@ -30,4 +34,8 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };

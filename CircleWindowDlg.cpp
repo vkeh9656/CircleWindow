@@ -31,6 +31,9 @@ void CCircleWindowDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CCircleWindowDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 
@@ -44,6 +47,12 @@ BOOL CCircleWindowDlg::OnInitDialog()
 	//  프레임워크가 이 작업을 자동으로 수행합니다.
 	SetIcon(m_hIcon, TRUE);			// 큰 아이콘을 설정합니다.
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
+	
+	CRgn rgn;
+	rgn.CreateEllipticRgn(0, 0, 200, 200);
+	SetWindowRgn(rgn, TRUE);
+
+	SetBackgroundColor(RGB(0, 200, 255));
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 
@@ -86,3 +95,46 @@ HCURSOR CCircleWindowDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CCircleWindowDlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	if (m_is_clicked == 0)
+	{
+		m_is_clicked = 1;
+		GetCursorPos(&m_prev_pos); // 전체 윈도우 기준으로 좌표값 가져와줌
+		SetCapture(); // 내 윈도우 밖으로 마우스가 빠져나가더라도 계속 마우스 메시지를 받을수있게해줌
+	}
+	
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+
+void CCircleWindowDlg::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	if (m_is_clicked == 1)
+	{
+		m_is_clicked = 0;
+		ReleaseCapture(); // SetCapture 해제
+	}
+
+	CDialogEx::OnLButtonUp(nFlags, point);
+}
+
+
+void CCircleWindowDlg::OnMouseMove(UINT nFlags, CPoint point)
+{
+	if (m_is_clicked == 1)
+	{
+		CRect r;
+		GetWindowRect(r);
+
+		CPoint pos;
+		GetCursorPos(&pos);
+
+		SetWindowPos(NULL, r.left + pos.x - m_prev_pos.x, r.top + pos.y - m_prev_pos.y, 0, 0, SWP_NOSIZE);
+		m_prev_pos = pos;
+	}
+
+	CDialogEx::OnMouseMove(nFlags, point);
+}
