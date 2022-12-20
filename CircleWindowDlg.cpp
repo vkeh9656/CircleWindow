@@ -54,7 +54,7 @@ BOOL CCircleWindowDlg::OnInitDialog()
 
 	SetBackgroundColor(RGB(0, 200, 255));
 
-	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	SetLayeredWindowAttributes(RGB(255,0,0), 80, LWA_ALPHA | LWA_COLORKEY); // colorkey == 특정 색상을 배제, 80 정도의 투명도
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -65,10 +65,9 @@ BOOL CCircleWindowDlg::OnInitDialog()
 
 void CCircleWindowDlg::OnPaint()
 {
+	CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
-
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
 		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
@@ -84,7 +83,24 @@ void CCircleWindowDlg::OnPaint()
 	}
 	else
 	{
-		CDialogEx::OnPaint();
+		dc.SelectStockObject(DC_BRUSH);
+		dc.SetDCBrushColor(RGB(255, 0, 0));
+		dc.SelectStockObject(NULL_PEN);
+		dc.Ellipse(30, 30, 170, 170);
+
+		CPen grid_pen(PS_DOT, 1, RGB(0, 0, 128));
+		CPen* p_old_pen = dc.SelectObject(&grid_pen);
+		dc.SetBkMode(TRANSPARENT);
+
+		dc.MoveTo(100, 30);
+		dc.LineTo(100, 170);
+
+		dc.MoveTo(30, 100);
+		dc.LineTo(170, 100);
+
+		dc.SelectObject(p_old_pen);
+		grid_pen.DeleteObject();
+		//CDialogEx::OnPaint();
 	}
 }
 
